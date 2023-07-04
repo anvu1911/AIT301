@@ -1,1 +1,2 @@
 # Handwritting Recognition
+Add streamlit 
