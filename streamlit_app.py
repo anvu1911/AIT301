@@ -13,9 +13,10 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-def thresholding(img):
+def thresholding(img, threshold=120):
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    ret, thresh = cv2.threshold(img_gray, 120, 255, cv2.THRESH_BINARY_INV)
+    ret, thresh = cv2.threshold(
+        img_gray, threshold, 255, cv2.THRESH_BINARY_INV)
     return thresh
 
 
@@ -60,10 +61,10 @@ def segmenting(img, dilated):
     return segmented_regions
 
 
-def segmentation(text_picture):
+def segmentation(text_picture, threshold):
     img = resizing(text_picture)
 
-    thresh_img = thresholding(img)
+    thresh_img = thresholding(img, threshold)
 
     dilated_img = dilating(thresh_img)
 
@@ -86,9 +87,12 @@ def main():
         image = Image.open(uploaded_file)
         st.markdown("***")
         st.image(image, use_column_width=True)
+        st.markdown(
+            f'<p class="big-font" style="text-align: left;">Choose threshold</p>', unsafe_allow_html=True)
+        threshold = st.slider('', 1, 255, 120)
         # check if the "Predict" button has been clicked
         if image is not None and st.button("Scan"):
-            segmented_regions = segmentation(image)
+            segmented_regions = segmentation(image, threshold)
             for cropped_image in segmented_regions:
                 st.image(cropped_image, width=800)
                 predicted_text = hsr_model.predict(cropped_image)
